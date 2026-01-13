@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { format } from 'date-fns';
 
 const AffiliatorDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'codes' | 'bookings' | 'earnings' | 'marketing'>('dashboard');

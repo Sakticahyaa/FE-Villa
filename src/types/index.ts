@@ -34,11 +34,13 @@ export interface PromoCode {
 }
 
 export interface GuestInfo {
-  fullName: string;
+  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone: string;
-  idNumber: string;
-  numberOfGuests: number;
+  idNumber?: string;
+  numberOfGuests?: number;
   specialRequests?: string;
 }
 
@@ -53,27 +55,39 @@ export interface BookingSummary {
 }
 
 export interface PaymentProof {
-  file: File;
+  file?: File;
+  imageUrl?: string;
   transferDate: Date;
   transferAmount: number;
+  uploadDate?: Date;
+  amount?: number;
 }
 
 export interface Booking {
   id: string;
-  bookingReference: string;
-  villa: Villa;
-  dates: DateRange;
+  bookingReference?: string;
+  villa?: Villa;
+  dates?: DateRange;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
   guestInfo: GuestInfo;
   pricing: {
-    originalPrice: number;
-    discountAmount: number;
-    finalPrice: number;
+    originalPrice?: number;
+    basePrice?: number;
+    numNights?: number;
+    subtotal?: number;
+    discount?: number;
+    discountAmount?: number;
+    finalPrice?: number;
+    total?: number;
     promoCode?: string;
   };
   paymentProof?: PaymentProof;
   status: 'pending' | 'confirmed' | 'rejected' | 'completed';
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
 export interface CalendarDate {

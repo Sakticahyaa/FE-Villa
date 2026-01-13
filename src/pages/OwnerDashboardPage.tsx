@@ -34,6 +34,7 @@ const OwnerDashboardPage: React.FC = () => {
         uploadDate: new Date('2025-03-01'),
         amount: 22500000,
         transferDate: new Date('2025-02-28'),
+        transferAmount: 22500000,
       },
       status: 'pending',
       createdAt: new Date('2025-03-01'),
@@ -235,7 +236,7 @@ const OwnerDashboardPage: React.FC = () => {
     },
   ]);
 
-  const [blockedDates, setBlockedDates] = useState<Date[]>([
+  const [blockedDates] = useState<Date[]>([
     new Date('2025-01-28'),
     new Date('2025-01-29'),
     new Date('2025-01-30'),
@@ -295,7 +296,7 @@ const OwnerDashboardPage: React.FC = () => {
     },
   ]);
 
-  const [promoCodes, setPromoCodes] = useState([
+  const [promoCodes] = useState([
     { code: 'TRAVEL10', discount: 10, type: 'percentage', affiliate: 'TravelBlogger123', uses: 5 },
     { code: 'SUMMER25', discount: 25, type: 'percentage', affiliate: 'SummerVibes', uses: 2 },
   ]);
@@ -440,10 +441,12 @@ const OwnerDashboardPage: React.FC = () => {
     const bookedDates: Date[] = [];
 
     allBookings.forEach(booking => {
-      const start = booking.dateRange.start;
-      const end = booking.dateRange.end;
-      const dates = eachDayOfInterval({ start, end });
-      bookedDates.push(...dates);
+      if (booking.dateRange) {
+        const start = booking.dateRange.start;
+        const end = booking.dateRange.end;
+        const dates = eachDayOfInterval({ start, end });
+        bookedDates.push(...dates);
+      }
     });
 
     return bookedDates;
@@ -461,6 +464,7 @@ const OwnerDashboardPage: React.FC = () => {
   const getBookingForDate = (date: Date) => {
     const allBookings = [...pendingBookings, ...activeBookings, ...approvedBookings];
     return allBookings.find(booking => {
+      if (!booking.dateRange) return false;
       const start = booking.dateRange.start;
       const end = booking.dateRange.end;
       return date >= start && date <= end;
@@ -766,10 +770,10 @@ const OwnerDashboardPage: React.FC = () => {
                     <div key={booking.id} className="flex justify-between items-center pb-3 border-b border-primary-100 last:border-0">
                       <div>
                         <p className="text-primary-900 font-medium">{booking.guestInfo.firstName} {booking.guestInfo.lastName}</p>
-                        <p className="text-sm text-primary-600">{formatDate(booking.dateRange.start)} - {formatDate(booking.dateRange.end)}</p>
+                        <p className="text-sm text-primary-600">{booking.dateRange && formatDate(booking.dateRange.start)} - {booking.dateRange && formatDate(booking.dateRange.end)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-primary-900 font-medium">{formatCurrency(booking.pricing.total)}</p>
+                        <p className="text-primary-900 font-medium">{formatCurrency(booking.pricing.total || 0)}</p>
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
                         }`}>
@@ -789,10 +793,10 @@ const OwnerDashboardPage: React.FC = () => {
                     <div key={booking.id} className="flex justify-between items-center pb-3 border-b border-primary-100 last:border-0">
                       <div>
                         <p className="text-primary-900 font-medium">{booking.guestInfo.firstName} {booking.guestInfo.lastName}</p>
-                        <p className="text-sm text-primary-600">Check-in: {formatDate(booking.dateRange.start)}</p>
+                        <p className="text-sm text-primary-600">Check-in: {booking.dateRange && formatDate(booking.dateRange.start)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-primary-900">{booking.pricing.numNights} nights</p>
+                        <p className="text-sm text-primary-900">{booking.pricing.numNights || 0} nights</p>
                       </div>
                     </div>
                   ))}
@@ -839,9 +843,9 @@ const OwnerDashboardPage: React.FC = () => {
                           <div>
                             <p className="text-sm text-primary-600 mb-1">Check-in / Check-out</p>
                             <p className="text-primary-900 font-medium">
-                              {formatDate(booking.dateRange.start)} - {formatDate(booking.dateRange.end)}
+                              {booking.dateRange && formatDate(booking.dateRange.start)} - {booking.dateRange && formatDate(booking.dateRange.end)}
                             </p>
-                            <p className="text-sm text-primary-600">{booking.pricing.numNights} nights</p>
+                            <p className="text-sm text-primary-600">{booking.pricing.numNights || 0} nights</p>
                           </div>
                           {booking.guestInfo.specialRequests && (
                             <div>
@@ -852,17 +856,17 @@ const OwnerDashboardPage: React.FC = () => {
                           <div className="pt-3 border-t border-primary-200">
                             <div className="flex justify-between text-sm mb-1">
                               <span className="text-primary-600">Subtotal</span>
-                              <span className="text-primary-900">{formatCurrency(booking.pricing.subtotal)}</span>
+                              <span className="text-primary-900">{formatCurrency(booking.pricing.subtotal || 0)}</span>
                             </div>
-                            {booking.pricing.discount > 0 && (
+                            {(booking.pricing.discount || 0) > 0 && (
                               <div className="flex justify-between text-sm mb-1">
                                 <span className="text-primary-600">Discount</span>
-                                <span className="text-green-600">-{formatCurrency(booking.pricing.discount)}</span>
+                                <span className="text-green-600">-{formatCurrency(booking.pricing.discount || 0)}</span>
                               </div>
                             )}
                             <div className="flex justify-between font-semibold text-lg mt-2">
                               <span className="text-primary-900">Total</span>
-                              <span className="text-primary-900">{formatCurrency(booking.pricing.total)}</span>
+                              <span className="text-primary-900">{formatCurrency(booking.pricing.total || 0)}</span>
                             </div>
                           </div>
                         </div>
@@ -884,7 +888,7 @@ const OwnerDashboardPage: React.FC = () => {
                               <div className="flex justify-between">
                                 <span className="text-primary-600">Amount Transferred</span>
                                 <span className="text-primary-900 font-medium">
-                                  {formatCurrency(booking.paymentProof.amount)}
+                                  {formatCurrency(booking.paymentProof.amount || booking.paymentProof.transferAmount)}
                                 </span>
                               </div>
                               <div className="flex justify-between">
@@ -896,7 +900,7 @@ const OwnerDashboardPage: React.FC = () => {
                               <div className="flex justify-between">
                                 <span className="text-primary-600">Uploaded</span>
                                 <span className="text-primary-900">
-                                  {formatDate(booking.paymentProof.uploadDate)}
+                                  {booking.paymentProof.uploadDate && formatDate(booking.paymentProof.uploadDate)}
                                 </span>
                               </div>
                             </div>
@@ -955,15 +959,15 @@ const OwnerDashboardPage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-primary-200">
                       <div>
                         <p className="text-sm text-primary-600 mb-1">Check-in Date</p>
-                        <p className="text-primary-900 font-medium">{formatDate(booking.dateRange.start)}</p>
+                        <p className="text-primary-900 font-medium">{booking.dateRange && formatDate(booking.dateRange.start)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-primary-600 mb-1">Check-out Date</p>
-                        <p className="text-primary-900 font-medium">{formatDate(booking.dateRange.end)}</p>
+                        <p className="text-primary-900 font-medium">{booking.dateRange && formatDate(booking.dateRange.end)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-primary-600 mb-1">Booking Value</p>
-                        <p className="text-primary-900 font-medium">{formatCurrency(booking.pricing.total)}</p>
+                        <p className="text-primary-900 font-medium">{formatCurrency(booking.pricing.total || 0)}</p>
                       </div>
                     </div>
                   </div>
@@ -1003,10 +1007,10 @@ const OwnerDashboardPage: React.FC = () => {
                         <td className="p-4 text-primary-900">
                           {booking.guestInfo.firstName} {booking.guestInfo.lastName}
                         </td>
-                        <td className="p-4 text-primary-700">{formatDate(booking.dateRange.start)}</td>
-                        <td className="p-4 text-primary-700">{formatDate(booking.dateRange.end)}</td>
-                        <td className="p-4 text-primary-700">{booking.pricing.numNights}</td>
-                        <td className="p-4 text-primary-900">{formatCurrency(booking.pricing.total)}</td>
+                        <td className="p-4 text-primary-700">{booking.dateRange && formatDate(booking.dateRange.start)}</td>
+                        <td className="p-4 text-primary-700">{booking.dateRange && formatDate(booking.dateRange.end)}</td>
+                        <td className="p-4 text-primary-700">{booking.pricing.numNights || 0}</td>
+                        <td className="p-4 text-primary-900">{formatCurrency(booking.pricing.total || 0)}</td>
                         <td className="p-4">
                           <span className="inline-block px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full">
                             Completed

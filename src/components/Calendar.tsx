@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isBefore, startOfToday, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, isBefore, startOfToday, addMonths, subMonths } from 'date-fns';
 
 interface CalendarProps {
   onDateSelect: (date: Date) => void;
