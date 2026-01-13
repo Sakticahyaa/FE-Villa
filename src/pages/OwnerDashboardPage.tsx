@@ -6,6 +6,7 @@ const OwnerDashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'pending' | 'active' | 'previous' | 'calendar' | 'pricing' | 'users' | 'promos'>('dashboard');
   const [currentMonth, setCurrentMonth] = useState(new Date(2025, 0, 1)); // Start at January 2025
   const [pricingMonth, setPricingMonth] = useState(new Date(2025, 0, 1)); // For pricing calendar
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Mock data - in real app, this would come from backend
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([
@@ -558,8 +559,18 @@ const OwnerDashboardPage: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-primary-50">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-primary-900 text-white fixed h-screen overflow-y-auto">
+      <aside className={`w-64 bg-primary-900 text-white fixed h-screen overflow-y-auto z-50 transition-transform duration-300 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0`}>
         <div className="p-6 border-b border-primary-800">
           <h1 className="text-2xl font-serif mb-1">Villa Sekipan</h1>
           <p className="text-sm text-primary-300">Owner Dashboard</p>
@@ -567,7 +578,7 @@ const OwnerDashboardPage: React.FC = () => {
 
         <nav className="p-4">
           <button
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => { setActiveTab('dashboard'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'dashboard'
                 ? 'bg-gold-600 text-white'
@@ -581,7 +592,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('pending')}
+            onClick={() => { setActiveTab('pending'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'pending'
                 ? 'bg-gold-600 text-white'
@@ -600,7 +611,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('active')}
+            onClick={() => { setActiveTab('active'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'active'
                 ? 'bg-gold-600 text-white'
@@ -619,7 +630,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('previous')}
+            onClick={() => { setActiveTab('previous'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'previous'
                 ? 'bg-gold-600 text-white'
@@ -633,7 +644,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('calendar')}
+            onClick={() => { setActiveTab('calendar'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'calendar'
                 ? 'bg-gold-600 text-white'
@@ -647,7 +658,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('pricing')}
+            onClick={() => { setActiveTab('pricing'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'pricing'
                 ? 'bg-gold-600 text-white'
@@ -661,7 +672,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('users')}
+            onClick={() => { setActiveTab('users'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'users'
                 ? 'bg-gold-600 text-white'
@@ -675,7 +686,7 @@ const OwnerDashboardPage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setActiveTab('promos')}
+            onClick={() => { setActiveTab('promos'); setSidebarOpen(false); }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
               activeTab === 'promos'
                 ? 'bg-gold-600 text-white'
@@ -691,10 +702,22 @@ const OwnerDashboardPage: React.FC = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64">
+      <main className="flex-1 lg:ml-64 w-full">
         {/* Header */}
-        <div className="bg-white border-b border-primary-200 px-8 py-6">
-          <h2 className="text-3xl font-serif text-primary-900">
+        <div className="bg-white border-b border-primary-200 px-4 sm:px-8 py-4 sm:py-6">
+          <div className="flex items-center gap-4">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-primary-900 focus:outline-none"
+              aria-label="Open menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <h2 className="text-2xl sm:text-3xl font-serif text-primary-900">
             {activeTab === 'dashboard' && 'Dashboard'}
             {activeTab === 'pending' && 'Pending Approvals'}
             {activeTab === 'active' && 'Active Bookings'}
@@ -703,11 +726,12 @@ const OwnerDashboardPage: React.FC = () => {
             {activeTab === 'pricing' && 'Pricing Editor'}
             {activeTab === 'users' && 'User Database'}
             {activeTab === 'promos' && 'Promo Codes'}
-          </h2>
+            </h2>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Dashboard Tab */}
           {activeTab === 'dashboard' && (
           <div>
