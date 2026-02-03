@@ -1,0 +1,79 @@
+flowchart TD
+    Start([Owner Accesses Dashboard]) --> Login[Navigate to /owner]
+    Login --> Dashboard[View Owner Dashboard]
+
+    Dashboard --> SelectTab{Select Tab}
+
+    SelectTab -->|Dashboard| ViewAnalytics[View Analytics Overview<br/>Revenue, Bookings, Stats]
+    SelectTab -->|Pending| PendingTab[View Pending Bookings]
+    SelectTab -->|Active| ActiveTab[View Active Bookings]
+    SelectTab -->|Previous| PreviousTab[View Previous Bookings]
+    SelectTab -->|Calendar| CalendarTab[View Booking Calendar]
+    SelectTab -->|Pricing| PricingTab[Manage Pricing]
+    SelectTab -->|Users| UsersTab[View User Database]
+    SelectTab -->|Promos| PromosTab[Manage Promo Codes]
+
+    %% Pending Bookings Flow
+    PendingTab --> ViewPending[View Booking Details<br/>Guest Info, Dates, Payment Proof]
+    ViewPending --> ReviewPayment{Review Payment?}
+    ReviewPayment -->|Approve| ApproveBooking[Approve Booking]
+    ReviewPayment -->|Reject| RejectBooking[Reject Booking]
+    ApproveBooking --> SendConfirmation[Send Confirmation Email]
+    RejectBooking --> SendRejection[Send Rejection Email]
+    SendConfirmation --> Dashboard
+    SendRejection --> Dashboard
+
+    %% Active Bookings Flow
+    ActiveTab --> ViewActive[View Currently Checked-in Guests<br/>Contact Info, Check-out Date]
+    ViewActive --> Dashboard
+
+    %% Previous Bookings Flow
+    PreviousTab --> ViewHistory[View Completed Bookings<br/>History & Records]
+    ViewHistory --> Dashboard
+
+    %% Calendar Flow
+    CalendarTab --> ViewCalendar[View Monthly Calendar]
+    ViewCalendar --> CalendarAction{Action?}
+    CalendarAction -->|View Bookings| SeeBooked[See Booked Dates Highlighted]
+    CalendarAction -->|Block Dates| BlockDates[Select Dates to Block<br/>Enter Reason]
+    SeeBooked --> Dashboard
+    BlockDates --> SaveBlock[Save Blocked Dates]
+    SaveBlock --> Dashboard
+
+    %% Pricing Flow
+    PricingTab --> ViewPricing[View Current Pricing<br/>Base, Weekend, Special]
+    ViewPricing --> PricingAction{Action?}
+    PricingAction -->|Edit Base| EditBase[Change Base Price]
+    PricingAction -->|Edit Weekend| EditWeekend[Change Weekend Multiplier]
+    PricingAction -->|Add Special| AddSpecial[Add Special Date Pricing<br/>Name, Dates, Price, Type]
+    PricingAction -->|Edit Special| EditSpecial[Edit Existing Special Price]
+    PricingAction -->|Delete Special| DeleteSpecial[Remove Special Pricing]
+    EditBase --> SavePricing[Save Changes]
+    EditWeekend --> SavePricing
+    AddSpecial --> SavePricing
+    EditSpecial --> SavePricing
+    DeleteSpecial --> SavePricing
+    SavePricing --> Dashboard
+
+    %% Users Flow
+    UsersTab --> ViewUsers[View User Database<br/>All Guests & Their Bookings]
+    ViewUsers --> Dashboard
+
+    %% Promos Flow
+    PromosTab --> ViewPromos[View Active Promo Codes]
+    ViewPromos --> PromoAction{Action?}
+    PromoAction -->|Create| CreatePromo[Create New Promo Code<br/>Code, Discount, Affiliate, Valid Until]
+    PromoAction -->|Delete| DeletePromo[Delete Promo Code]
+    CreatePromo --> SavePromo[Save Promo Code]
+    DeletePromo --> SavePromo
+    SavePromo --> Dashboard
+
+    ViewAnalytics --> Dashboard
+
+    Dashboard --> Logout([Logout / Exit])
+
+    style Start fill:#90EE90
+    style Logout fill:#FFB6C1
+    style ApproveBooking fill:#B0E0E6
+    style RejectBooking fill:#FFE4B5
+    style SavePricing fill:#DDA0DD

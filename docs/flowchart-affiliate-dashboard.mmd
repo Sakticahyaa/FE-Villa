@@ -1,0 +1,68 @@
+flowchart TD
+    Start([Affiliate Accesses Dashboard]) --> Login[Navigate to /affiliate]
+    Login --> Dashboard[View Affiliate Dashboard<br/>ID, Name, Commission Rate]
+
+    Dashboard --> SelectTab{Select Tab}
+
+    SelectTab -->|Dashboard| ViewOverview[View Performance Overview<br/>Commission, Bookings, Revenue, Conversion]
+    SelectTab -->|Promo Codes| CodesTab[View My Promo Codes]
+    SelectTab -->|Bookings| BookingsTab[View Bookings Using My Codes]
+    SelectTab -->|Earnings| EarningsTab[View Earnings & Payouts]
+    SelectTab -->|Marketing| MarketingTab[View Marketing Materials]
+
+    %% Dashboard Overview
+    ViewOverview --> ViewStats[View Stats Cards<br/>Total Commission, Bookings, Revenue]
+    ViewStats --> ViewRecent[View Recent Activity<br/>Active Codes, Recent Bookings]
+    ViewRecent --> Dashboard
+
+    %% Promo Codes Flow
+    CodesTab --> ViewCodes[View All Promo Codes<br/>Code, Discount, Uses, Commission]
+    ViewCodes --> CodeDetail[View Code Details<br/>Revenue Generated, Total Uses]
+    CodeDetail --> CopyAction{Action?}
+    CopyAction -->|Copy Link| CopyBookingLink[Copy Booking Link with Code<br/>Share on Social Media]
+    CopyAction -->|View Performance| ViewCodePerformance[View Code Performance Stats]
+    CopyBookingLink --> Dashboard
+    ViewCodePerformance --> Dashboard
+
+    %% Bookings Flow
+    BookingsTab --> ViewAllBookings[View All Bookings Table<br/>ID, Guest, Date, Code, Price, Commission]
+    ViewAllBookings --> FilterBookings{Filter?}
+    FilterBookings -->|By Code| FilterByCode[Filter by Promo Code]
+    FilterBookings -->|By Status| FilterByStatus[Filter by Confirmed/Pending]
+    FilterBookings -->|View All| ViewAllBookings
+    FilterByCode --> ViewAllBookings
+    FilterByStatus --> ViewAllBookings
+    ViewAllBookings --> Dashboard
+
+    %% Earnings Flow
+    EarningsTab --> ViewEarnings[View Earnings Summary<br/>Confirmed, Pending, Lifetime Total]
+    ViewEarnings --> ViewBreakdown[View Commission Breakdown by Code]
+    ViewBreakdown --> PayoutAction{Action?}
+    PayoutAction -->|Request Payout| RequestPayout[Request Monthly Payout<br/>Confirmed Earnings]
+    PayoutAction -->|View Info| ViewPayoutInfo[View Payout Schedule<br/>Monthly on 5th]
+    RequestPayout --> SubmitRequest[Submit Payout Request]
+    SubmitRequest --> Dashboard
+    ViewPayoutInfo --> Dashboard
+
+    %% Marketing Flow
+    MarketingTab --> ViewMarketing[View Marketing Resources]
+    ViewMarketing --> MarketingAction{Select Resource}
+    MarketingAction -->|Quick Links| ViewLinks[View Website & Booking Links<br/>Copy to Share]
+    MarketingAction -->|Copy Templates| ViewTemplates[View Pre-written Copy<br/>Social Media & Email]
+    MarketingAction -->|Download Assets| ViewAssets[View Image Assets<br/>Exterior, Interior, Pool]
+
+    ViewLinks --> CopyLink[Copy Link to Clipboard]
+    ViewTemplates --> CopyTemplate[Copy Template Text]
+    ViewAssets --> DownloadImage[Download Image for Promotion]
+
+    CopyLink --> Dashboard
+    CopyTemplate --> Dashboard
+    DownloadImage --> Dashboard
+
+    Dashboard --> Logout([Logout / Exit])
+
+    style Start fill:#90EE90
+    style Logout fill:#FFB6C1
+    style CopyBookingLink fill:#B0E0E6
+    style RequestPayout fill:#FFD700
+    style DownloadImage fill:#DDA0DD

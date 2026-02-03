@@ -1,0 +1,131 @@
+graph TB
+    subgraph "Frontend - React + TypeScript + Vite"
+        subgraph "Pages"
+            HomePage[HomePage<br/>Hero, Features, Amenities]
+            VillaPage[VillaPage<br/>Villa Details, Specs]
+            BookingPage[BookingPage<br/>Date Selection, Guest Form]
+            ReviewPage[ReviewPage<br/>Booking Summary]
+            PaymentPage[PaymentPage<br/>Bank Transfer, Upload Proof]
+            ConfirmPage[ConfirmationPage<br/>Booking Reference]
+            OwnerDash[OwnerDashboardPage<br/>8 Tabs: Dashboard, Pending,<br/>Active, Previous, Calendar,<br/>Pricing, Users, Promos]
+            AffiliateDash[AffiliatorDashboardPage<br/>5 Tabs: Dashboard, Codes,<br/>Bookings, Earnings, Marketing]
+        end
+
+        subgraph "Components"
+            Nav[Navigation<br/>Responsive Navbar<br/>Hamburger Menu]
+            Footer[Footer<br/>Contact Info]
+            Calendar[Calendar<br/>Date Picker Component]
+        end
+
+        subgraph "Context / State Management"
+            BookingContext[BookingContext<br/>- dateRange<br/>- guestInfo<br/>- promoCode<br/>- appliedPromo<br/>- pricing]
+        end
+
+        subgraph "Layouts"
+            MainLayout[MainLayout<br/>Nav + Outlet + Footer]
+        end
+
+        subgraph "Routing"
+            Router[React Router<br/>Client-Side Routing]
+        end
+
+        subgraph "Types"
+            Types[TypeScript Types<br/>Booking, GuestInfo,<br/>PaymentProof, Villa,<br/>PromoCode, etc.]
+        end
+    end
+
+    subgraph "Backend API (Future Implementation)"
+        subgraph "API Endpoints"
+            BookingAPI[Booking API<br/>POST /bookings<br/>GET /bookings/:id<br/>PATCH /bookings/:id]
+            PromoAPI[Promo API<br/>GET /promos/validate<br/>POST /promos<br/>DELETE /promos/:id]
+            PricingAPI[Pricing API<br/>GET /pricing<br/>PUT /pricing/base<br/>POST /pricing/special]
+            AffiliateAPI[Affiliate API<br/>GET /affiliate/stats<br/>GET /bookings?affiliateCode<br/>POST /affiliate/payout]
+            CalendarAPI[Calendar API<br/>GET /calendar/availability<br/>POST /calendar/block<br/>DELETE /calendar/block/:id]
+        end
+
+        subgraph "Services"
+            AuthService[Auth Service<br/>Owner/Affiliate Login<br/>JWT Tokens]
+            FileService[File Upload Service<br/>Payment Proof Storage<br/>S3/Cloud Storage]
+            EmailService[Email Service<br/>Booking Confirmations<br/>Notifications]
+            PaymentService[Payment Verification<br/>Manual Review Process]
+        end
+
+        subgraph "Database"
+            DB[(Database<br/>PostgreSQL/MySQL)<br/><br/>Tables:<br/>- bookings<br/>- guests<br/>- promo_codes<br/>- pricing_rules<br/>- blocked_dates<br/>- affiliates<br/>- commissions]
+        end
+    end
+
+    subgraph "Deployment"
+        Netlify[Netlify<br/>Static Site Hosting<br/>Auto Deploy from GitHub]
+        CDN[CDN<br/>Static Assets<br/>Images, CSS, JS]
+    end
+
+    subgraph "External Services (Future)"
+        BankAPI[Bank API<br/>Payment Verification<br/>Transaction Matching]
+        EmailProvider[Email Provider<br/>SendGrid/Mailgun<br/>Transactional Emails]
+        Storage[Cloud Storage<br/>AWS S3/Cloudinary<br/>Payment Proof Images]
+    end
+
+    %% Frontend Flow
+    Router --> MainLayout
+    MainLayout --> Nav
+    MainLayout --> HomePage
+    MainLayout --> VillaPage
+    MainLayout --> BookingPage
+    MainLayout --> ReviewPage
+    MainLayout --> PaymentPage
+    MainLayout --> ConfirmPage
+    MainLayout --> OwnerDash
+    MainLayout --> AffiliateDash
+    MainLayout --> Footer
+
+    Nav --> Router
+    BookingPage --> Calendar
+    OwnerDash --> Calendar
+
+    BookingPage --> BookingContext
+    ReviewPage --> BookingContext
+    PaymentPage --> BookingContext
+
+    Types -.Type Definitions.-> BookingPage
+    Types -.Type Definitions.-> ReviewPage
+    Types -.Type Definitions.-> PaymentPage
+    Types -.Type Definitions.-> OwnerDash
+    Types -.Type Definitions.-> AffiliateDash
+
+    %% Frontend to Backend
+    BookingPage -.Future API Calls.-> PromoAPI
+    PaymentPage -.Future API Calls.-> BookingAPI
+    OwnerDash -.Future API Calls.-> BookingAPI
+    OwnerDash -.Future API Calls.-> PricingAPI
+    OwnerDash -.Future API Calls.-> CalendarAPI
+    OwnerDash -.Future API Calls.-> PromoAPI
+    AffiliateDash -.Future API Calls.-> AffiliateAPI
+    AffiliateDash -.Future API Calls.-> BookingAPI
+
+    %% Backend Services
+    BookingAPI --> DB
+    PromoAPI --> DB
+    PricingAPI --> DB
+    AffiliateAPI --> DB
+    CalendarAPI --> DB
+
+    BookingAPI --> EmailService
+    BookingAPI --> FileService
+    AffiliateAPI --> EmailService
+
+    FileService --> Storage
+    EmailService --> EmailProvider
+    BookingAPI -.Future Integration.-> BankAPI
+
+    %% Deployment
+    Router --> Netlify
+    Netlify --> CDN
+
+    style BookingContext fill:#FFD700
+    style DB fill:#4682B4,color:#fff
+    style Netlify fill:#00C7B7,color:#fff
+    style OwnerDash fill:#DDA0DD
+    style AffiliateDash fill:#98FB98
+    style BookingPage fill:#87CEEB
+    style PaymentPage fill:#FFB6C1

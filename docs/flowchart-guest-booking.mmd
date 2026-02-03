@@ -1,0 +1,39 @@
+flowchart TD
+    Start([Guest Visits Website]) --> Homepage[View Homepage]
+    Homepage --> ViewVilla{User Action?}
+
+    ViewVilla -->|Click 'The Villa'| VillaPage[View Villa Details Page]
+    ViewVilla -->|Click 'Book Now'| BookingPage[Go to Booking Page]
+    VillaPage --> BookNow[Click 'Book Now']
+    BookNow --> BookingPage
+
+    BookingPage --> SelectDates[Select Check-in & Check-out Dates]
+    SelectDates --> EnterGuests[Enter Number of Guests]
+    EnterGuests --> EnterDetails[Fill Guest Information<br/>Name, Email, Phone, ID, Special Requests]
+    EnterDetails --> PromoCode{Enter Promo Code?}
+
+    PromoCode -->|Yes| ApplyPromo[Apply Promo Code<br/>Get Discount]
+    PromoCode -->|No| ReviewBooking
+    ApplyPromo --> ReviewBooking[Go to Review Page]
+
+    ReviewBooking --> ViewSummary[View Booking Summary<br/>Dates, Guest Info, Pricing]
+    ViewSummary --> ConfirmDetails{Details Correct?}
+
+    ConfirmDetails -->|No| BookingPage
+    ConfirmDetails -->|Yes| PaymentPage[Go to Payment Page]
+
+    PaymentPage --> ViewBankDetails[View Bank Transfer Details<br/>Account Name, Number, Amount]
+    ViewBankDetails --> MakeTransfer[Make Bank Transfer]
+    MakeTransfer --> UploadProof[Upload Payment Receipt]
+    UploadProof --> EnterTransferDate[Enter Transfer Date]
+    EnterTransferDate --> SubmitBooking[Submit Booking]
+
+    SubmitBooking --> ConfirmationPage[View Confirmation Page<br/>Booking Reference Number]
+    ConfirmationPage --> WaitApproval[Wait for Owner Approval<br/>24-48 hours]
+    WaitApproval --> EmailConfirmation[Receive Email Confirmation]
+    EmailConfirmation --> End([Booking Complete])
+
+    style Start fill:#90EE90
+    style End fill:#FFB6C1
+    style PaymentPage fill:#FFE4B5
+    style ConfirmationPage fill:#B0E0E6

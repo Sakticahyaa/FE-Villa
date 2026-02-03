@@ -1,0 +1,147 @@
+sequenceDiagram
+    actor Guest as Guest User
+    participant Browser as Browser/React App
+    participant Nav as Navigation Component
+    participant BC as Booking Context
+    participant BP as Booking Page
+    participant RP as Review Page
+    participant PP as Payment Page
+    participant CP as Confirmation Page
+    participant API as Backend API (Future)
+    participant Email as Email Service (Future)
+
+    Note over Guest,Email: Guest Booking Flow
+
+    Guest->>Browser: Visit Website
+    Browser->>Nav: Load Navigation
+    Nav-->>Guest: Display Homepage
+
+    Guest->>Nav: Click "Book Now"
+    Nav->>BP: Navigate to /book
+
+    Note over BP,BC: Step 1: Date & Guest Selection
+    Guest->>BP: Select Check-in/Check-out Dates
+    BP->>BC: setDateRange(dates)
+    BC-->>BP: Dates saved to context
+
+    Guest->>BP: Enter Guest Information
+    BP->>BC: setGuestInfo(info)
+    BC-->>BP: Guest info saved to context
+
+    Guest->>BP: Enter Promo Code (Optional)
+    BP->>BC: setPromoCode(code)
+    BP->>API: Validate Promo Code
+    API-->>BP: Return discount details
+    BP->>BC: setAppliedPromo(promo)
+    BC-->>BP: Promo applied
+
+    Guest->>BP: Click "Continue to Review"
+    BP->>RP: Navigate to /review
+
+    Note over RP,BC: Step 2: Review Booking
+    RP->>BC: Get booking data (dates, guest, pricing)
+    BC-->>RP: Return booking context
+    RP-->>Guest: Display booking summary
+
+    Guest->>RP: Review Details
+    alt Details Incorrect
+        Guest->>RP: Click "Back"
+        RP->>BP: Navigate to /book
+    else Details Correct
+        Guest->>RP: Click "Proceed to Payment"
+        RP->>BC: setPricing(finalPricing)
+        BC-->>RP: Pricing saved
+        RP->>PP: Navigate to /payment
+    end
+
+    Note over PP,Email: Step 3: Payment & Submission
+    PP->>BC: Get booking data
+    BC-->>PP: Return full booking context
+    PP-->>Guest: Display bank transfer details & form
+
+    Guest->>Guest: Make bank transfer
+    Guest->>PP: Upload payment proof
+    Guest->>PP: Enter transfer date
+    Guest->>PP: Click "Submit Booking"
+
+    PP->>PP: Validate form data
+    PP->>API: POST /bookings (FormData with payment proof)
+    Note over API: Create booking record<br/>Upload payment proof<br/>Set status: pending
+
+    API->>API: Generate Booking Reference
+    API-->>PP: Return booking ID & reference
+
+    PP->>CP: Navigate to /confirmation/:bookingId
+    CP->>API: GET /bookings/:bookingId
+    API-->>CP: Return booking details
+    CP-->>Guest: Display confirmation & reference number
+
+    API->>Email: Send booking confirmation email to guest
+    Email-->>Guest: Email sent
+    API->>Email: Send notification to owner
+    Email-->>Guest: Owner notified
+
+    Note over Guest,Email: Owner Approval Process (Async)
+
+    actor Owner as Villa Owner
+    participant OD as Owner Dashboard
+
+    Owner->>OD: Login to /owner
+    OD->>API: GET /bookings?status=pending
+    API-->>OD: Return pending bookings list
+
+    Owner->>OD: Select booking to review
+    OD->>API: GET /bookings/:bookingId/payment-proof
+    API-->>OD: Return payment proof image
+
+    Owner->>OD: Review payment proof
+
+    alt Approve Booking
+        Owner->>OD: Click "Approve"
+        OD->>API: PATCH /bookings/:bookingId {status: confirmed}
+        API->>API: Update booking status
+        API->>Email: Send approval email to guest
+        Email-->>Guest: Booking confirmed email
+        API-->>OD: Return success
+        OD-->>Owner: Show confirmation
+    else Reject Booking
+        Owner->>OD: Click "Reject"
+        OD->>API: PATCH /bookings/:bookingId {status: rejected}
+        API->>API: Update booking status
+        API->>Email: Send rejection email to guest
+        Email-->>Guest: Booking rejected email
+        API-->>OD: Return success
+        OD-->>Owner: Show confirmation
+    end
+
+    Note over Guest,Email: Affiliate Tracking (Parallel Flow)
+
+    actor Affiliate as Affiliate User
+    participant AD as Affiliate Dashboard
+
+    Guest->>Browser: Visit with affiliate link (?code=TRAVEL10)
+    Browser->>BC: Store promo code in context
+    Note over BC: Promo code pre-filled in booking form
+
+    Guest->>BP: Complete booking with promo code
+    BP->>API: Submit booking with promo code
+    API->>API: Track affiliate conversion<br/>Calculate commission (15%)
+    API-->>BP: Booking created
+
+    Affiliate->>AD: Login to /affiliate
+    AD->>API: GET /affiliate/stats
+    API-->>AD: Return commission, bookings, earnings
+    AD-->>Affiliate: Display performance overview
+
+    Affiliate->>AD: View bookings using code
+    AD->>API: GET /bookings?affiliateCode=TRAVEL10
+    API-->>AD: Return filtered bookings
+    AD-->>Affiliate: Display bookings table with commission
+
+    Affiliate->>AD: Request payout
+    AD->>API: POST /affiliate/payout-request
+    API->>API: Process payout request
+    API->>Email: Send payout confirmation
+    Email-->>Affiliate: Payout scheduled email
+    API-->>AD: Request submitted
+    AD-->>Affiliate: Confirmation message
